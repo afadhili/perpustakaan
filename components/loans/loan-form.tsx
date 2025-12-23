@@ -18,6 +18,15 @@ import { Plus, Edit } from "lucide-react";
 import { getAllMembers } from "@/actions/members";
 import { getAllbooks } from "@/actions/books";
 import { toast } from "sonner";
+import { SingleSelectMember } from "../members/single-select";
+import { SingleSelectBook } from "../books/single-select";
+import { Select } from "@radix-ui/react-select";
+import {
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 interface LoanFormProps {
   loanId?: number;
@@ -298,45 +307,35 @@ export default function LoanForm({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid gap-3">
-            <Label htmlFor="memberId">Anggota *</Label>
-            <select
-              id="memberId"
-              name="memberId"
-              value={formData.memberId}
-              onChange={handleChange}
-              className={`w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring ${errors.memberId ? "border-red-500" : ""}`}
-            >
-              <option value="">Pilih anggota</option>
-              {members.map((member) => (
-                <option key={member.id} value={member.id}>
-                  {member.name}
-                </option>
-              ))}
-            </select>
+            <Label>Anggota *</Label>
+            <SingleSelectMember
+              members={members}
+              value={formData.memberId ? Number(formData.memberId) : null}
+              onChange={(id) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  memberId: id?.toString() || "",
+                }))
+              }
+            />
             {errors.memberId && (
               <p className="text-red-500 text-sm">{errors.memberId}</p>
             )}
           </div>
 
           <div className="grid gap-3">
-            <Label htmlFor="bookId">Buku *</Label>
-            <select
-              id="bookId"
-              name="bookId"
-              value={formData.bookId}
-              onChange={handleChange}
-              className={`w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring ${errors.bookId ? "border-red-500" : ""}`}
-            >
-              <option value="">Pilih buku</option>
-              {books
-                .filter((book) => loanId || book.availableCopies > 0) // Only show available books for new loans
-                .map((book) => (
-                  <option key={book.id} value={book.id}>
-                    {book.title} ({book.author}) - Tersedia:{" "}
-                    {book.availableCopies}
-                  </option>
-                ))}
-            </select>
+            <Label>Buku *</Label>
+            <SingleSelectBook
+              books={books}
+              value={formData.bookId ? Number(formData.bookId) : null}
+              onChange={(id) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  bookId: id?.toString() || "",
+                }))
+              }
+              onlyAvailable={!loanId}
+            />
             {errors.bookId && (
               <p className="text-red-500 text-sm">{errors.bookId}</p>
             )}
@@ -374,17 +373,21 @@ export default function LoanForm({
 
           <div className="grid gap-3">
             <Label htmlFor="status">Status</Label>
-            <select
-              id="status"
-              name="status"
+            <Select
               value={formData.status}
-              onChange={handleChange}
-              className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              onValueChange={(value) => {
+                setFormData((prev) => ({ ...prev, status: value }));
+              }}
             >
-              <option value="borrowed">Dipinjam</option>
-              <option value="returned">Dikembalikan</option>
-              <option value="overdue">Terlambat</option>
-            </select>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Pilih Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="borrowed">Dipinjam</SelectItem>
+                <SelectItem value="returned">Dikembalikan</SelectItem>
+                <SelectItem value="overdue">Terlambat</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="grid gap-3">
