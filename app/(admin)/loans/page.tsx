@@ -339,7 +339,7 @@ export default function Loans() {
             >
               Sebelumnya
             </Button>
-            <span className="text-sm text-muted-foreground min-w-[80px] text-center">
+            <span className="text-sm text-muted-foreground min-w-20 text-center">
               Halaman {currentPage} dari {totalPages}
             </span>
             <Button
