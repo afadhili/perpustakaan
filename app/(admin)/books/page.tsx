@@ -39,7 +39,7 @@ export default function Books() {
           book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
           book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
           book.categories.some((cat) =>
-            cat.name.toLowerCase().includes(searchTerm.toLowerCase()),
+            cat?.name?.toLowerCase().includes(searchTerm.toLowerCase()),
           ),
       );
       setFilteredBooks(results);

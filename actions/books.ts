@@ -1,5 +1,5 @@
 "use server";
-import { eq, and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { book, loan, bookCategory, category } from "@/lib/db/schema";
 
@@ -9,7 +9,7 @@ export type DetailedBook = Book & {
   categoryIds: number[];
   categories: {
     id: number;
-    name: string;
+    name: string | null;
     description: string | null;
   }[];
 };
@@ -38,7 +38,7 @@ export const getAllbooks = async () => {
     // Kelompokkan hasil berdasarkan buku
     const groupedBooks: Record<number, DetailedBook> = {};
 
-    books.forEach(row => {
+    books.forEach((row) => {
       if (!groupedBooks[row.id]) {
         groupedBooks[row.id] = {
           id: row.id,
@@ -54,7 +54,9 @@ export const getAllbooks = async () => {
       }
 
       if (row.categoryId !== null) {
-        const existingCat = groupedBooks[row.id].categories.find(cat => cat.id === row.categoryId);
+        const existingCat = groupedBooks[row.id].categories.find(
+          (cat) => cat.id === row.categoryId,
+        );
         if (!existingCat) {
           groupedBooks[row.id].categories.push({
             id: row.categoryId,
@@ -109,9 +111,11 @@ export const getBookById = async (id: number) => {
       categories: [],
     };
 
-    bookData.forEach(row => {
+    bookData.forEach((row) => {
       if (row.categoryId !== null) {
-        const existingCat = detailedBook.categories.find(cat => cat.id === row.categoryId);
+        const existingCat = detailedBook.categories.find(
+          (cat) => cat.id === row.categoryId,
+        );
         if (!existingCat) {
           detailedBook.categories.push({
             id: row.categoryId,
@@ -138,24 +142,27 @@ export const addBook = async (formData: FormData) => {
   const totalCopies = Number(formData.get("totalCopies"));
   const availableCopies = Number(formData.get("availableCopies"));
 
-  const newBook = await db.insert(book).values({
-    title,
-    author,
-    publicationDate,
-    totalCopies,
-    availableCopies,
-  }).returning();
+  const newBook = await db
+    .insert(book)
+    .values({
+      title,
+      author,
+      publicationDate,
+      totalCopies,
+      availableCopies,
+    })
+    .returning();
 
   // Ambil kategori dari form data jika ada
-  const categoryIdsString = formData.get('categoryIds') as string | null;
+  const categoryIdsString = formData.get("categoryIds") as string | null;
   if (categoryIdsString) {
     const categoryIds = JSON.parse(categoryIdsString) as number[];
 
     // Tambahkan relasi buku-kategori
     if (categoryIds.length > 0) {
-      const relationsToInsert = categoryIds.map(categoryId => ({
+      const relationsToInsert = categoryIds.map((categoryId) => ({
         bookId: newBook[0].id,
-        categoryId: categoryId
+        categoryId: categoryId,
       }));
 
       await db.insert(bookCategory).values(relationsToInsert);
@@ -185,7 +192,7 @@ export const updateBook = async (id: number, formData: FormData) => {
     .where(eq(book.id, id));
 
   // Ambil kategori dari form data dan update relasi
-  const categoryIdsString = formData.get('categoryIds') as string | null;
+  const categoryIdsString = formData.get("categoryIds") as string | null;
   if (categoryIdsString) {
     const categoryIds = JSON.parse(categoryIdsString) as number[];
 
@@ -194,9 +201,9 @@ export const updateBook = async (id: number, formData: FormData) => {
 
     // Tambahkan relasi kategori yang baru
     if (categoryIds.length > 0) {
-      const relationsToInsert = categoryIds.map(categoryId => ({
+      const relationsToInsert = categoryIds.map((categoryId) => ({
         bookId: id,
-        categoryId: categoryId
+        categoryId: categoryId,
       }));
 
       await db.insert(bookCategory).values(relationsToInsert);
@@ -225,10 +232,13 @@ export const removeBookCategories = async (bookId: number) => {
 };
 
 // Fungsi untuk menambahkan kategori ke buku
-export const addBookCategories = async (bookId: number, categoryIds: number[]) => {
-  const relationsToInsert = categoryIds.map(categoryId => ({
+export const addBookCategories = async (
+  bookId: number,
+  categoryIds: number[],
+) => {
+  const relationsToInsert = categoryIds.map((categoryId) => ({
     bookId,
-    categoryId
+    categoryId,
   }));
 
   await db.insert(bookCategory).values(relationsToInsert);

@@ -17,7 +17,10 @@ export const getAllMembers = async () => {
 
 export const getMemberById = async (id: number) => {
   try {
-    const [memberData] = await db.select().from(member).where(eq(member.id, id));
+    const [memberData] = await db
+      .select()
+      .from(member)
+      .where(eq(member.id, id));
     return memberData;
   } catch (error) {
     console.error("Error in getMemberById:", error);
@@ -31,7 +34,7 @@ export const addMember = async (formData: FormData) => {
   const email = formData.get("email") as string;
   const phone = formData.get("phone") as string;
   const address = formData.get("address") as string;
-  const status = formData.get("status") as string || "active";
+  const status = (formData.get("status") as "active" | "inactive") || "active";
 
   await db.insert(member).values({
     name,
@@ -48,7 +51,7 @@ export const updateMember = async (id: number, formData: FormData) => {
   const email = formData.get("email") as string;
   const phone = formData.get("phone") as string;
   const address = formData.get("address") as string;
-  const status = formData.get("status") as string || "active";
+  const status = formData.get("status") as "active" | "inactive";
 
   await db
     .update(member)

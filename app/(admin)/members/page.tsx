@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Edit3, Plus, Trash } from "lucide-react";
+import { Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import MemberForm from "@/components/members/member-form";
@@ -67,7 +67,9 @@ export default function Members() {
       const result = await deleteMember(id);
       if (result.success) {
         toast.success(result.message);
-        setMembers((prevMembers) => prevMembers.filter((member) => member.id !== id));
+        setMembers((prevMembers) =>
+          prevMembers.filter((member) => member.id !== id),
+        );
         setFilteredMembers((prevMembers) =>
           prevMembers.filter((member) => member.id !== id),
         );
@@ -92,15 +94,18 @@ export default function Members() {
           </p>
         </div>
         <div className="flex items-center space-x-4">
-          <MemberForm triggerButton="add" onSuccess={() => {
-            // Refresh data setelah menambah anggota
-            const fetchData = async () => {
-              const membersData = await getAllMembers();
-              setMembers(membersData);
-              setFilteredMembers(membersData);
-            };
-            fetchData();
-          }} />
+          <MemberForm
+            triggerButton="add"
+            onSuccess={() => {
+              // Refresh data setelah menambah anggota
+              const fetchData = async () => {
+                const membersData = await getAllMembers();
+                setMembers(membersData);
+                setFilteredMembers(membersData);
+              };
+              fetchData();
+            }}
+          />
         </div>
       </div>
 
@@ -141,17 +146,19 @@ export default function Members() {
                   <TableCell>{member.phone}</TableCell>
                   <TableCell>{member.address}</TableCell>
                   <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      member.status === "active" 
-                        ? "bg-green-100 text-green-800" 
-                        : "bg-red-100 text-red-800"
-                    }`}>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        member.status === "active"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
                       {member.status === "active" ? "Aktif" : "Tidak Aktif"}
                     </span>
                   </TableCell>
                   <TableCell className="flex items-center space-x-2">
-                    <MemberForm 
-                      memberId={member.id} 
+                    <MemberForm
+                      memberId={member.id}
                       initialData={{
                         name: member.name,
                         email: member.email,

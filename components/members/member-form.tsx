@@ -17,6 +17,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { UserPlus, Edit3 } from "lucide-react";
 import { toast } from "sonner";
+import { Select } from "@radix-ui/react-select";
+import {
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 interface MemberFormProps {
   memberId?: number;
@@ -31,14 +38,14 @@ interface MemberFormProps {
   onSuccess?: () => void;
 }
 
-export default function MemberForm({ 
-  memberId, 
-  initialData, 
-  triggerButton = "add", 
-  onSuccess 
+export default function MemberForm({
+  memberId,
+  initialData,
+  triggerButton = "add",
+  onSuccess,
 }: MemberFormProps) {
   const [isOpen, setIsOpen] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     name: initialData?.name || "",
     email: initialData?.email || "",
@@ -46,45 +53,49 @@ export default function MemberForm({
     address: initialData?.address || "",
     status: initialData?.status || "active",
   });
-  
+
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!formData.name.trim()) {
       newErrors.name = "Nama anggota wajib diisi";
     }
-    
+
     if (!formData.email.trim()) {
       newErrors.email = "Email anggota wajib diisi";
     } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
       newErrors.email = "Format email tidak valid";
     }
-    
+
     if (!formData.phone.trim()) {
       newErrors.phone = "Nomor telepon wajib diisi";
     }
-    
+
     if (!formData.address.trim()) {
       newErrors.address = "Alamat wajib diisi";
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validate()) {
       return;
     }
@@ -102,10 +113,10 @@ export default function MemberForm({
         Object.entries(submitData).forEach(([key, value]) => {
           formDataToSend.append(key, value);
         });
-        
+
         response = await fetch(`/api/members/${memberId}`, {
-          method: 'PUT',
-          body: formDataToSend
+          method: "PUT",
+          body: formDataToSend,
         });
       } else {
         // Create new member
@@ -113,21 +124,30 @@ export default function MemberForm({
         Object.entries(submitData).forEach(([key, value]) => {
           formDataToSend.append(key, value);
         });
-        
-        response = await fetch('/api/members', {
-          method: 'POST',
-          body: formDataToSend
+
+        response = await fetch("/api/members", {
+          method: "POST",
+          body: formDataToSend,
         });
       }
 
       const result = await response.json();
-      
+
       if (result.success) {
-        toast.success(memberId ? "Anggota berhasil diperbarui" : "Anggota baru berhasil ditambahkan");
+        toast.success(
+          memberId
+            ? "Anggota berhasil diperbarui"
+            : "Anggota baru berhasil ditambahkan",
+        );
         setIsOpen(false);
         onSuccess?.();
       } else {
-        toast.error(result.error || (memberId ? "Gagal memperbarui anggota" : "Gagal menambahkan anggota"));
+        toast.error(
+          result.error ||
+            (memberId
+              ? "Gagal memperbarui anggota"
+              : "Gagal menambahkan anggota"),
+        );
       }
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -156,12 +176,12 @@ export default function MemberForm({
             {memberId ? "Edit Anggota" : "Tambah Anggota Baru"}
           </DialogTitle>
           <DialogDescription>
-            {memberId 
-              ? "Edit informasi anggota." 
+            {memberId
+              ? "Edit informasi anggota."
               : "Tambah anggota baru ke perpustakaan Anda."}
           </DialogDescription>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid gap-3">
             <Label htmlFor="name">Nama Lengkap *</Label>
@@ -173,9 +193,11 @@ export default function MemberForm({
               placeholder="Masukkan nama lengkap anggota"
               className={errors.name ? "border-red-500" : ""}
             />
-            {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+            {errors.name && (
+              <p className="text-red-500 text-sm">{errors.name}</p>
+            )}
           </div>
-          
+
           <div className="grid gap-3">
             <Label htmlFor="email">Email *</Label>
             <Input
@@ -187,9 +209,11 @@ export default function MemberForm({
               placeholder="Masukkan alamat email"
               className={errors.email ? "border-red-500" : ""}
             />
-            {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+            {errors.email && (
+              <p className="text-red-500 text-sm">{errors.email}</p>
+            )}
           </div>
-          
+
           <div className="grid gap-3">
             <Label htmlFor="phone">Nomor Telepon *</Label>
             <Input
@@ -200,9 +224,11 @@ export default function MemberForm({
               placeholder="Masukkan nomor telepon"
               className={errors.phone ? "border-red-500" : ""}
             />
-            {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
+            {errors.phone && (
+              <p className="text-red-500 text-sm">{errors.phone}</p>
+            )}
           </div>
-          
+
           <div className="grid gap-3">
             <Label htmlFor="address">Alamat *</Label>
             <Textarea
@@ -213,23 +239,29 @@ export default function MemberForm({
               placeholder="Masukkan alamat lengkap"
               className={errors.address ? "border-red-500" : ""}
             />
-            {errors.address && <p className="text-red-500 text-sm">{errors.address}</p>}
+            {errors.address && (
+              <p className="text-red-500 text-sm">{errors.address}</p>
+            )}
           </div>
-          
+
           <div className="grid gap-3">
             <Label htmlFor="status">Status</Label>
-            <select
-              id="status"
-              name="status"
+            <Select
               value={formData.status}
-              onChange={handleChange}
-              className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              onValueChange={(value) =>
+                setFormData((prev) => ({ ...prev, status: value }))
+              }
             >
-              <option value="active">Aktif</option>
-              <option value="inactive">Tidak Aktif</option>
-            </select>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Pilih Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">Aktif</SelectItem>
+                <SelectItem value="inactive">Tidak Aktif</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          
+
           <DialogFooter>
             <DialogClose asChild>
               <Button variant="outline">Batal</Button>
