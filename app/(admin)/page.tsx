@@ -2,6 +2,8 @@
 import { Book, getAllbooks } from "@/actions/books";
 import { getAllLoans, Loan } from "@/actions/loans";
 import { getAllMembers, Member } from "@/actions/members";
+import BookForm from "@/components/books/book-form";
+import MemberForm from "@/components/members/member-form";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,7 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { BookPlus, PlusIcon, UserPlus } from "lucide-react";
+import { BookPlus, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -44,12 +46,26 @@ export default function Home() {
           </p>
         </div>
         <div className="flex items-center space-x-4">
-          <Button>
-            Tambah Buku <PlusIcon />
-          </Button>
-          <Button>
-            Tambah Anggota <UserPlus />
-          </Button>
+          <BookForm
+            triggerButton="add"
+            onSuccess={() => {
+              const fetchData = async () => {
+                const booksData = await getAllbooks();
+                setBooks(booksData);
+              };
+              fetchData();
+            }}
+          />
+          <MemberForm
+            triggerButton="add"
+            onSuccess={() => {
+              const fetchData = async () => {
+                const membersData = await getAllMembers();
+                setMembers(membersData);
+              };
+              fetchData();
+            }}
+          />
         </div>
       </div>
 

@@ -97,7 +97,6 @@ export default function Books() {
           <BookForm
             triggerButton="add"
             onSuccess={() => {
-              // Refresh data setelah menambah buku
               const fetchData = async () => {
                 const booksData = await getAllbooks();
                 setBooks(booksData);
