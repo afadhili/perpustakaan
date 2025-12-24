@@ -3,13 +3,13 @@ export default function Footer() {
     <footer className="bg-background py-4 my-auto border-t border-border">
       <div className="container mx-auto text-center">
         <p className="text-sm text-muted-foreground">
-          &copy; 2023{" "}
+          &copy; 2025{" "}
           <a
             className="hover:underline hover:text-primary"
             href="https://github.com/afadhili"
             target="_blank"
           >
-            @afadhili
+            Perpustakaan
           </a>
           . All rights reserved.
         </p>
